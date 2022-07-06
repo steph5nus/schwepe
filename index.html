@@ -4,22 +4,152 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Schwepe</title>
+	<title>schwepe</title>
 	<style>
-		canvas {
+		body,
+		html {
+			margin: 0;
+			padding: 0;
+			background: #25252B;
+		}
+
+		* {
+			touch-action: manipulation;
+		}
+
+		*,
+		*:before,
+		*:after {
+			box-sizing: border-box;
+		}
+
+		body {
+			position: relative;
+			color: white;
+			letter-spacing: 2px;
+			font-size: 11px;
+			font-family: 'Poppins', sans-serif;
+			width: 100%;
+			height: 100vh;
+			background-color: #d699ff;
+			background-image: radial-gradient(at 66% 13%, hsla(263, 84%, 68%, 1) 0px, transparent 50%),
+				radial-gradient(at 65% 60%, hsla(230, 67%, 76%, 1) 0px, transparent 50%),
+				radial-gradient(at 33% 9%, hsla(251, 85%, 70%, 1) 0px, transparent 50%),
+				radial-gradient(at 79% 11%, hsla(348, 62%, 79%, 1) 0px, transparent 50%),
+				radial-gradient(at 52% 8%, hsla(288, 70%, 68%, 1) 0px, transparent 50%),
+				radial-gradient(at 4% 22%, hsla(152, 76%, 67%, 1) 0px, transparent 50%),
+				radial-gradient(at 22% 78%, hsla(315, 68%, 74%, 1) 0px, transparent 50%);
+		}
+
+		.wrapper {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		#c {
+			position: absolute;
+			top: 0;
+			background-color: #99fff1;
+			background-image:
+				radial-gradient(at 36% 21%, hsla(13, 97%, 63%, 1) 0px, transparent 50%),
+				radial-gradient(at 92% 93%, hsla(344, 74%, 73%, 1) 0px, transparent 50%),
+				radial-gradient(at 37% 57%, hsla(296, 62%, 74%, 1) 0px, transparent 50%),
+				radial-gradient(at 91% 89%, hsla(235, 94%, 77%, 1) 0px, transparent 50%),
+				radial-gradient(at 18% 29%, hsla(42, 65%, 66%, 1) 0px, transparent 50%),
+				radial-gradient(at 33% 63%, hsla(124, 96%, 74%, 1) 0px, transparent 50%),
+				radial-gradient(at 61% 11%, hsla(75, 83%, 64%, 1) 0px, transparent 50%);
+			width: 100%;
+			height: 100%;
+			display: block;
+		}
+
+		.loading {
 			position: fixed;
+			z-index: 50;
+			width: 100%;
+			height: 100%;
 			top: 0;
 			left: 0;
+			background-color: #99fff1;
+			background-image:
+				radial-gradient(at 36% 21%, hsla(13, 97%, 63%, 1) 0px, transparent 50%),
+				radial-gradient(at 92% 93%, hsla(344, 74%, 73%, 1) 0px, transparent 50%),
+				radial-gradient(at 37% 57%, hsla(296, 62%, 74%, 1) 0px, transparent 50%),
+				radial-gradient(at 91% 89%, hsla(235, 94%, 77%, 1) 0px, transparent 50%),
+				radial-gradient(at 18% 29%, hsla(42, 65%, 66%, 1) 0px, transparent 50%),
+				radial-gradient(at 33% 63%, hsla(124, 96%, 74%, 1) 0px, transparent 50%),
+				radial-gradient(at 61% 11%, hsla(75, 83%, 64%, 1) 0px, transparent 50%);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.loader {
+			-webkit-perspective: 120px;
+			-moz-perspective: 120px;
+			-ms-perspective: 120px;
+			perspective: 120px;
+			width: 100px;
+			height: 100px;
+		}
+
+		.loader:before {
+			content: "";
+			position: absolute;
+			left: 25px;
+			top: 25px;
+			width: 50px;
+			height: 50px;
+			background-color: #9bffaf;
+			animation: flip 1s infinite;
+		}
+
+		@keyframes flip {
+			0% {
+				transform: rotate(0);
+			}
+
+			50% {
+				transform: rotateY(180deg);
+			}
+
+			100% {
+				transform: rotateY(180deg) rotateX(180deg);
+			}
+		}
+
+		.top-text {
+			position: absolute;
+			display: block;
+			z-index: 100;
+			bottom: 2em;
+			left: 2em;
+			font-weight: bold;
 		}
 	</style>
 </head>
 
 <body>
-	<canvas id="scene"></canvas>
-	<!-- potential html content here -->
-	<!-- <script src="js/three.js"></script> -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<!-- The loading element overlays all else until the model is loaded, at which point we remove this element from the DOM -->
+	<div class="loading" id="js-loader">
+		<div class="loader"></div>
+	</div>
 
+	<div class="wrapper">
+		<!-- The canvas element is used to draw the 3D scene -->
+		<canvas id="c"></canvas>
+	</div>
+
+	<figcaption class="top-text" style="color: hsl(218, 81%, 75%)">
+		Ａｎ🎙️Ｅｎｔｒｙｐ❍ｉｎｔ，<br />
+		<a target="_blank" href="https://dsc.gg/entrypoint">
+			<cite title="Source Title">ｐｒ❍ｂａｂｌｙ　ｅｎｔｅｒｉｎｇ❓</cite>
+		</a>
+	</figcaption>
+
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 	<script type="importmap">
 	  {
 	    "imports": {
@@ -27,118 +157,355 @@
 	    }
 	  }
 	</script>
-
 	<script type="module">
 
 		import * as THREE from 'three';
 		import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
 		import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/loaders/GLTFLoader.js';
+		import { CinematicCamera } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/cameras/CinematicCamera.js';
 
-		let mixer; 
 
-		const clock = new THREE.Clock();
-		const scene = new THREE.Scene();
+		(function () {
 
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		const aspect = width / height;
+			// Set our main variables
+			let scene,
+				renderer,
+				camera,
+				model,                              // schwepe
+				neck,                               // Ref2 : neck bone 
+				waist,                              // Ref2 : waist bone
+				possibleAnims,                      // Anims found in our file
+				mixer,                              // THREE.js animations mixer
+				idle,                               // Idle, the default state our character returns to
+				clock = new THREE.Clock(),          // Used for anims, which run to a clock instead of frame rate 
+				currentlyAnimating = false,         // Used to check whether characters neck is being used in another anim
+				raycaster = new THREE.Raycaster(),  // Used to detect the click on our character
+				loaderAnim = document.getElementById('js-loader');
 
-		const camera = new THREE.PerspectiveCamera(50, aspect, 1, 1000);
+			init();
 
-		const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.querySelector('#scene'), });
-		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(window.innerWidth, window.innerHeight);
+			function init() {
 
-		//cute green cube
-		const geometry = new THREE.BoxGeometry(1, 1, 1);
-		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-		const cube = new THREE.Mesh(geometry, material);
+				const MODEL_PATH = 'schwepe.glb';
+				const canvas = document.querySelector('#c');
+				const backgroundColor = 0xf1f1f1;
 
-		scene.add(cube);
-		cube.position.setY(-2);
+				// Init the scene
+				scene = new THREE.Scene();
+				// scene.background = new THREE.Color(backgroundColor);
+				scene.fog = new THREE.Fog(backgroundColor, 60, 100);
 
-		// weareonethreethreesevenheclgang @ 247420
-		const muralTextr = new THREE.TextureLoader().load("https://pbs.twimg.com/media/FWQc330XoAAFUif?format=jpg&name=large");
-		const mural = new THREE.Mesh(
-			new THREE.PlaneGeometry(50, 20),
-			new THREE.MeshBasicMaterial({ map: muralTextr })
-		);
+				// Init the renderer
+				renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+				renderer.setPixelRatio(window.devicePixelRatio);
+				document.body.appendChild(renderer.domElement);
 
-		scene.add(mural);
-		mural.position.setY(9);
-		mural.position.setZ(-12);
+				// Add a camera
+				camera = new CinematicCamera(
+					20,
+					window.innerWidth / window.innerHeight,
+					0.1,
+					1000
+				);
 
-		// the holy juan
-		const loader = new GLTFLoader();
+				camera.position.z = 45
+				camera.position.x = 0;
+				camera.position.y = -2.9;
 
-		loader.load('schwepe.glb', function (gltf) {
+				// const controls = new OrbitControls(camera, renderer.domElement);
 
-			const schwepe = gltf.scene;
-			schwepe.scale.set(3, 3, 3);
-			scene.add(schwepe);
+				//cute green cube
+				const cubeGeo = new THREE.BoxGeometry(1,1,1);
+				const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+				const cube = new THREE.Mesh(cubeGeo, cubeMat);
 
-			mixer = new THREE.AnimationMixer(schwepe);
-			mixer.clipAction (gltf.animations [0 ]).play();
-			// schwepe.animations.forEach((clip) => {
+				cube.position.z = 15;
+				cube.position.y = -10;
 
-			// 	mixer.clipAction(clip).play();
+				scene.add(cube);
 
-			// });
+				// weareonethreethreesevenheclgang @ 247420
+				// const muralTextr = new THREE.TextureLoader().load("https://pbs.twimg.com/media/FWQc330XoAAFUif?format=jpg&name=large");
+				// const mural = new THREE.Mesh(
+				// 	new THREE.PlaneGeometry(115, 35),
+				// 	new THREE.MeshBasicMaterial({ map: muralTextr })
+				// );
 
-			animate();
-		}, undefined, function (error) {
+				// scene.add(mural);
+				// mural.position.setY(14);
+				// mural.position.setZ(-30);
+				// the holy juan
+				const loader = new GLTFLoader();
+				loader.load(
+					MODEL_PATH,
+					function (gltf) {
 
-			console.error(error);
+						const schwepe = gltf.scene;
+						const schwepeAnims = gltf.animations;
+						schwepe.traverse(o => {
+							// if (o.isBone) {
 
-		});
+							// 	console.log(o.name);
 
-		camera.position.setY(5);
-		camera.position.setZ(20);
+							// }
+							if (o.isMesh) {
 
-		// Lights
+								o.castShadow = true;
+								o.receiveShadow = true;
 
-		const pointLight = new THREE.PointLight(0xffffff);
-		pointLight.position.set(5, 5, 5);
+							}
 
-		const ambientLight = new THREE.AmbientLight(0xffffff);
-		scene.add(pointLight, ambientLight);
+							if (o.isBone && o.name === 'mixamorigNeck') {
+								neck = o;
+							}
 
-		// Helpers
+							if (o.isBone && o.name === 'mixamorigSpine') {
+								waist = o;
+							}
 
-		const lightHelper = new THREE.PointLightHelper(pointLight)
-		const gridHelper = new THREE.GridHelper(30, 30);
-		const camHelper = new THREE.CameraHelper(camera);
-		scene.add(lightHelper, gridHelper, camHelper)
+						});
+						schwepe.scale.set(4, 4, 4);
+						schwepe.position.y = -11;
+						scene.add(schwepe);
+						loaderAnim.remove();
+						mixer = new THREE.AnimationMixer(schwepe);
+						let clips = schwepeAnims.filter(val => val.name !== 'idle');
+						possibleAnims = clips.map(val => {
 
-		// const controls = new OrbitControls(camera, renderer.domElement);
+							let clip = THREE.AnimationClip.findByName(clips, val.name);
 
-		
-		function animate() {
-			requestAnimationFrame(animate);
+							clip.tracks.splice(3, 3);
+							clip.tracks.splice(9, 3);
 
-			cube.rotation.x += .04;
-			cube.rotation.y += .04;
-			cube.rotation.z += .04;
+							clip = mixer.clipAction(clip);
+							return clip;
 
-			var delta = clock.getDelta();
+						});
+						let idleAnim = THREE.AnimationClip.findByName(schwepeAnims, 'idle');
 
-			if (mixer) mixer.update(delta)
+						idleAnim.tracks.splice(3, 3);
+						idleAnim.tracks.splice(9, 3);
 
-			renderer.render(scene, camera);
-		};
+						idle = mixer.clipAction(idleAnim);
+						idle.play();
+						update();
+					}, undefined, function (error) {
 
-		animate();
+						console.error(error);
 
-		function onWindowResize() {
-			var newWidth = window.innerWidth,
-				newHeight = window.innerHeight,
-				newAspect = newWidth / newHeight;
-			camera.aspect = newAspect;
-			camera.updateProjectionMatrix();
-			renderer.setSize(newWidth, newHeight);
-		}
+					});
+				// Add lights
+				let hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
+				hemiLight.position.set(0, 50, 0);
+				// Add hemisphere light to scene
+				scene.add(hemiLight);
 
-		window.addEventListener('resize', onWindowResize);
+				let d = 8.25;
+				let dirLight = new THREE.DirectionalLight(0xffffff, 0.54);
+				dirLight.position.set(-8, 12, 8);
+				dirLight.castShadow = true;
+				dirLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
+				dirLight.shadow.camera.near = 0.1;
+				dirLight.shadow.camera.far = 1500;
+				dirLight.shadow.camera.left = d * -1;
+				dirLight.shadow.camera.right = d;
+				dirLight.shadow.camera.top = d;
+				dirLight.shadow.camera.bottom = d * -1;
+				// Add directional Light to scene
+				scene.add(dirLight);
+
+				// Floor
+				let floorGeometry = new THREE.PlaneGeometry(5000, 5000, 1, 1);
+				let floorMaterial = new THREE.MeshPhongMaterial({
+
+					color: 0xeeeeee,
+					shininess: 0,
+
+				});
+
+				let floor = new THREE.Mesh(floorGeometry, floorMaterial);
+				floor.rotation.x = -0.5 * Math.PI; // This is 90 degrees by the way
+				floor.receiveShadow = true;
+				floor.position.y = -11;
+				scene.add(floor);
+
+				function update() {
+					
+					requestAnimationFrame(update);
+					if (mixer) {
+						
+						mixer.update(clock.getDelta());
+
+					}
+					cube.rotation.x += .004;
+					cube.rotation.y += .004;
+					cube.rotation.z += .004;
+					if (resizeRendererToDisplaySize(renderer)) {
+						
+						const canvas = renderer.domElement;
+						camera.aspect = canvas.clientWidth / canvas.clientHeight;
+						camera.updateProjectionMatrix();
+
+					}
+					renderer.render(scene, camera);
+
+				}
+
+				update();
+
+				function resizeRendererToDisplaySize(renderer) {
+
+					const canvas = renderer.domElement;
+					let width = window.innerWidth;
+					let height = window.innerHeight;
+					let canvasPixelWidth = canvas.width / window.devicePixelRatio;
+					let canvasPixelHeight = canvas.height / window.devicePixelRatio;
+
+					const needResize =
+						canvasPixelWidth !== width || canvasPixelHeight !== height;
+					if (needResize) {
+						renderer.setSize(width, height, false);
+					}
+					return needResize;
+
+				}
+
+				window.addEventListener('click', e => raycast(e));
+				window.addEventListener('touchend', e => raycast(e, true));
+
+				function raycast(e, touch = false) {
+					
+					var mouse = {};
+					if (touch) {
+						
+						mouse.x = 2 * (e.changedTouches[0].clientX / window.innerWidth) - 1;
+						mouse.y = 1 - 2 * (e.changedTouches[0].clientY / window.innerHeight);
+
+					} else {
+
+						mouse.x = 2 * (e.clientX / window.innerWidth) - 1;
+						mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
+
+					}
+					// update the picking ray with the camera and mouse position
+					raycaster.setFromCamera(mouse, camera);
+
+					// calculate objects intersecting the picking ray
+					var intersects = raycaster.intersectObjects(scene.children, true);
+
+					if (intersects[0]) {
+						
+						var object = intersects[0].object;
+
+						if (object.name === 'schwepe') {
+
+							if (!currentlyAnimating) {
+								
+								currentlyAnimating = true;
+								playOnClick();
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Get a random animation, and play it 
+				function playOnClick() {
+					mixer.clipAction(gltf.animations[0,1]).play();
+					let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
+					playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
+				}
+
+				function playModifierAnimation(from, fSpeed, to, tSpeed) {
+					to.setLoop(THREE.LoopOnce);
+					to.reset();
+					to.play();
+					from.crossFadeTo(to, fSpeed, true);
+					setTimeout(function () {
+						from.enabled = true;
+						to.crossFadeTo(from, tSpeed, true);
+						currentlyAnimating = false;
+					}, to._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000));
+				}
+
+				document.addEventListener('mousemove', function (e) {
+
+					var mousecoords = getMousePos(e);
+
+					if (neck && waist) {
+						moveJoint(mousecoords, neck, 50);
+						moveJoint(mousecoords, waist, 30);
+					}
+
+				});
+
+				function getMousePos(e) {
+
+					return { x: e.clientX, y: e.clientY };
+
+				}
+
+				function moveJoint(mouse, joint, degreeLimit) {
+
+					let degrees = getMouseDegrees(mouse.x, mouse.y, degreeLimit);
+					joint.rotation.y = THREE.Math.degToRad(degrees.x);
+					joint.rotation.x = THREE.Math.degToRad(degrees.y);
+
+				}
+
+				function getMouseDegrees(x, y, degreeLimit) {
+
+					let dx = 0,
+						dy = 0,
+						xdiff,
+						xPercentage,
+						ydiff,
+						yPercentage;
+
+					let w = { x: window.innerWidth, y: window.innerHeight };
+
+					// Left (Rotates neck left between 0 and -degreeLimit)
+
+					// 1. If cursor is in the left half of screen
+					if (x <= w.x / 2) {
+						// 2. Get the difference between middle of screen and cursor position
+						xdiff = w.x / 2 - x;
+						// 3. Find the percentage of that difference (percentage toward edge of screen)
+						xPercentage = (xdiff / (w.x / 2)) * 100;
+						// 4. Convert that to a percentage of the maximum rotation we allow for the neck
+						dx = ((degreeLimit * xPercentage) / 100) * -1;
+					}
+					// Right (Rotates neck right between 0 and degreeLimit)
+					if (x >= w.x / 2) {
+						xdiff = x - w.x / 2;
+						xPercentage = (xdiff / (w.x / 2)) * 100;
+						dx = (degreeLimit * xPercentage) / 100;
+					}
+					// Up (Rotates neck up between 0 and -degreeLimit)
+					if (y <= w.y / 2) {
+						ydiff = w.y / 2 - y;
+						yPercentage = (ydiff / (w.y / 2)) * 100;
+						// Note that I cut degreeLimit in half when she looks up
+						dy = (((degreeLimit * 0.5) * yPercentage) / 100) * -1;
+					}
+					// Down (Rotates neck down between 0 and degreeLimit)
+					if (y >= w.y / 2) {
+						ydiff = y - w.y / 2;
+						yPercentage = (ydiff / (w.y / 2)) * 100;
+						dy = (degreeLimit * yPercentage) / 100;
+					}
+					return { x: dx, y: dy };
+
+				}
+
+			}
+
+		})(); // exitpoint
 	</script>
 </body>
 
