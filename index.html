@@ -1,1 +1,145 @@
-Schwepe.co.za
+<!-- Schwepe.co.za -->
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Schwepe</title>
+	<style>
+		canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="scene"></canvas>
+	<!-- potential html content here -->
+	<!-- <script src="js/three.js"></script> -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+	  {
+	    "imports": {
+	      "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.module.js"
+	    }
+	  }
+	</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+		import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
+		import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/loaders/GLTFLoader.js';
+
+		let mixer; 
+
+		const clock = new THREE.Clock();
+		const scene = new THREE.Scene();
+
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const aspect = width / height;
+
+		const camera = new THREE.PerspectiveCamera(50, aspect, 1, 1000);
+
+		const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.querySelector('#scene'), });
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		//cute green cube
+		const geometry = new THREE.BoxGeometry(1, 1, 1);
+		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+		const cube = new THREE.Mesh(geometry, material);
+
+		scene.add(cube);
+		cube.position.setY(-2);
+
+		// weareonethreethreesevenheclgang @ 247420
+		const muralTextr = new THREE.TextureLoader().load("https://pbs.twimg.com/media/FWQc330XoAAFUif?format=jpg&name=large");
+		const mural = new THREE.Mesh(
+			new THREE.PlaneGeometry(50, 20),
+			new THREE.MeshBasicMaterial({ map: muralTextr })
+		);
+
+		scene.add(mural);
+		mural.position.setY(9);
+		mural.position.setZ(-12);
+
+		// the holy juan
+		const loader = new GLTFLoader();
+
+		loader.load('schwepe.glb', function (gltf) {
+
+			const schwepe = gltf.scene;
+			schwepe.scale.set(3, 3, 3);
+			scene.add(schwepe);
+
+			mixer = new THREE.AnimationMixer(schwepe);
+			mixer.clipAction (gltf.animations [0 ]).play();
+			// schwepe.animations.forEach((clip) => {
+
+			// 	mixer.clipAction(clip).play();
+
+			// });
+
+			animate();
+		}, undefined, function (error) {
+
+			console.error(error);
+
+		});
+
+		camera.position.setY(5);
+		camera.position.setZ(20);
+
+		// Lights
+
+		const pointLight = new THREE.PointLight(0xffffff);
+		pointLight.position.set(5, 5, 5);
+
+		const ambientLight = new THREE.AmbientLight(0xffffff);
+		scene.add(pointLight, ambientLight);
+
+		// Helpers
+
+		const lightHelper = new THREE.PointLightHelper(pointLight)
+		const gridHelper = new THREE.GridHelper(30, 30);
+		const camHelper = new THREE.CameraHelper(camera);
+		scene.add(lightHelper, gridHelper, camHelper)
+
+		// const controls = new OrbitControls(camera, renderer.domElement);
+
+		
+		function animate() {
+			requestAnimationFrame(animate);
+
+			cube.rotation.x += .04;
+			cube.rotation.y += .04;
+			cube.rotation.z += .04;
+
+			var delta = clock.getDelta();
+
+			if (mixer) mixer.update(delta)
+
+			renderer.render(scene, camera);
+		};
+
+		animate();
+
+		function onWindowResize() {
+			var newWidth = window.innerWidth,
+				newHeight = window.innerHeight,
+				newAspect = newWidth / newHeight;
+			camera.aspect = newAspect;
+			camera.updateProjectionMatrix();
+			renderer.setSize(newWidth, newHeight);
+		}
+
+		window.addEventListener('resize', onWindowResize);
+	</script>
+</body>
+
+</html>
