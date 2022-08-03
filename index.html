@@ -7,14 +7,13 @@
 	<title>schwepe</title>
 	<link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/emojis/893594073250807828.webp">
 	<meta property="og:title" content="schwepe" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://schwepe.co.za" />
-<meta property="og:image" content="https://cdn.discordapp.com/emojis/893594073250807828.webp" />
-<meta property="og:description" content="the official website for schwepe. an entrypoint probably emerging." />
-<meta name="theme-color" content="#FF0000">
-
-<!-- Include this to make the og:image larger -->
-<meta name="twitter:card" content="summary_large_image">
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://schwepe.co.za" />
+	<meta property="og:image" content="https://cdn.discordapp.com/emojis/893594073250807828.webp" />
+	<meta property="og:description" content="the official website for schwepe. an entrypoint probably emerging." />
+	<meta name="theme-color" content="#e094e6">
+	<!-- Include this to make the og:image larger -->
+	<meta name="twitter:card" content="summary_large_image">
 	<style>
 		body,
 		html {
@@ -58,6 +57,26 @@
 			align-items: center;
 		}
 
+		p {
+			max-width: 600px;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 0 2em;
+		}
+
+		.info {
+			position: absolute;
+			display: block;
+			cursor: pointer;
+			top: 0px;
+			width: 100%;
+			padding: 10px;
+			box-sizing: border-box;
+			text-align: center;
+			z-index: 1;
+			/* TODO Solve this in HTML */
+		}
+
 		#c {
 			position: absolute;
 			top: 0;
@@ -65,7 +84,7 @@
 			background-image:
 				radial-gradient(at 36% 21%, hsla(13, 97%, 63%, 1) 0px, transparent 50%),
 				radial-gradient(at 92% 93%, hsla(344, 74%, 73%, 1) 0px, transparent 50%),
-				radial-gradient(at 37% 57%, hsla(296, 62%, 74%, 1) 0px, transparent 50%),
+				radial-gradient(at 37% 57%, #e094e6 0px, transparent 50%),
 				radial-gradient(at 91% 89%, hsla(235, 94%, 77%, 1) 0px, transparent 50%),
 				radial-gradient(at 18% 29%, hsla(42, 65%, 66%, 1) 0px, transparent 50%),
 				radial-gradient(at 33% 63%, hsla(124, 96%, 74%, 1) 0px, transparent 50%),
@@ -139,6 +158,8 @@
 			font-weight: bold;
 		}
 	</style>
+	<!-- <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script> -->
+	<!-- <script src="https://unpkg.com/aframe-gradient-sky@1.3.0/dist/gradientsky.min.js"></script> -->
 </head>
 
 <body>
@@ -146,19 +167,21 @@
 	<div class="loading" id="js-loader">
 		<div class="loader"></div>
 	</div>
-<a target="_blank" href="/entrypoint/entrypoint.html">
+	<div class="info">
+		a <a href="https://woodmurderedhat.com" target="_blank" rel="noopener">wood🪵murdered🪓hat👒</a> idea
+		(modeled by <a href="https://irb0gie.vercel.app/" target="_blank" rel="noopener">👒szabo0️⃣genie🧞</a>)<br />
+	</div>
 	<div class="wrapper">
 		<!-- The canvas element is used to draw the 3D scene -->
 		<canvas id="c"></canvas>
+
 	</div>
-	</a>
 	<figcaption class="top-text" style="color: hsl(218, 81%, 75%)">
 		Ａｎ🎙️Ｅｎｔｒｙｐ❍ｉｎｔ，<br />
 		<a target="_blank" href="https://dsc.gg/entrypoint">
 			<cite title="Source Title">ｐｒ❍ｂａｂｌｙ　ｅｎｔｅｒｉｎｇ❓</cite>
 		</a>
 	</figcaption>
-
 	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 	<script type="importmap">
 	  {
@@ -170,144 +193,47 @@
 	<script type="module">
 
 		import * as THREE from 'three';
-		import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
+		import Stats from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/libs/stats.module.js';
+		import { GUI } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/libs/lil-gui.module.min.js';
 		import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/loaders/GLTFLoader.js';
+		import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
 		import { CinematicCamera } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/cameras/CinematicCamera.js';
-
 
 		(function () {
 
 			// Set our main variables
-			let scene,
-				renderer,
-				camera,
-				model,                              // schwepe
-				neck,                               // Ref2 : neck bone 
-				waist,                              // Ref2 : waist bone
-				possibleAnims,                      // Anims found in our file
-				mixer,                              // THREE.js animations mixer
-				idle,                               // Idle, the default state our character returns to
-				clock = new THREE.Clock(),          // Used for anims, which run to a clock instead of frame rate 
-				currentlyAnimating = false,         // Used to check whether characters neck is being used in another anim
-				raycaster = new THREE.Raycaster(),  // Used to detect the click on our character
+			let container,
+				scene,
+				stats, gui,
+				clock = new THREE.Clock(),
+				renderer, camera,
+				model, neck, waist, face,
+				mixer, idle, blink, jump,
+				raycaster = new THREE.Raycaster(),
 				loaderAnim = document.getElementById('js-loader');
+
+			const api = { state: 'idle' };
 
 			init();
 
 			function init() {
+				// weareonethreethreesevenheclgang @ 247420 
+				container = document.createElement('div');
+				document.body.appendChild(container);
 
-				const MODEL_PATH = 'schwepe.glb';
+				camera = new CinematicCamera(20, window.innerWidth / window.innerHeight, 0.1, 1000);
+				camera.position.set(0, -2.9, 45);
+
 				const canvas = document.querySelector('#c');
-				const backgroundColor = 0xf1f1f1;
+				const GLB_PATH = 'schwepev2.glb';
 
-				// Init the scene
+				// scene 
+				const backgroundColor = 0xe0e0e0;
 				scene = new THREE.Scene();
-				// scene.background = new THREE.Color(backgroundColor);
 				scene.fog = new THREE.Fog(backgroundColor, 60, 100);
 
-				// Init the renderer
-				renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
-				renderer.setPixelRatio(window.devicePixelRatio);
-				document.body.appendChild(renderer.domElement);
-
-				// Add a camera
-				camera = new CinematicCamera(
-					20,
-					window.innerWidth / window.innerHeight,
-					0.1,
-					1000
-				);
-
-				camera.position.z = 45
-				camera.position.x = 0;
-				camera.position.y = -2.9;
-
-				// const controls = new OrbitControls(camera, renderer.domElement);
-
-				//cute green cube
-				const cubeGeo = new THREE.BoxGeometry(1,1,1);
-				const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-				const cube = new THREE.Mesh(cubeGeo, cubeMat);
-
-				cube.position.z = 15;
-				cube.position.y = -10;
-
-				scene.add(cube);
-
-				// weareonethreethreesevenheclgang @ 247420
-				// const muralTextr = new THREE.TextureLoader().load("https://pbs.twimg.com/media/FWQc330XoAAFUif?format=jpg&name=large");
-				// const mural = new THREE.Mesh(
-				// 	new THREE.PlaneGeometry(115, 35),
-				// 	new THREE.MeshBasicMaterial({ map: muralTextr })
-				// );
-
-				// scene.add(mural);
-				// mural.position.setY(14);
-				// mural.position.setZ(-30);
-				// the holy juan
-				const loader = new GLTFLoader();
-				loader.load(
-					MODEL_PATH,
-					function (gltf) {
-
-						const schwepe = gltf.scene;
-						const schwepeAnims = gltf.animations;
-						schwepe.traverse(o => {
-							// if (o.isBone) {
-
-							// 	console.log(o.name);
-
-							// }
-							if (o.isMesh) {
-
-								o.castShadow = true;
-								o.receiveShadow = true;
-
-							}
-
-							if (o.isBone && o.name === 'mixamorigNeck') {
-								neck = o;
-							}
-
-							if (o.isBone && o.name === 'mixamorigSpine') {
-								waist = o;
-							}
-
-						});
-						schwepe.scale.set(4, 4, 4);
-						schwepe.position.y = -11;
-						scene.add(schwepe);
-						loaderAnim.remove();
-						mixer = new THREE.AnimationMixer(schwepe);
-						let clips = schwepeAnims.filter(val => val.name !== 'idle');
-						possibleAnims = clips.map(val => {
-
-							let clip = THREE.AnimationClip.findByName(clips, val.name);
-
-							clip.tracks.splice(3, 3);
-							clip.tracks.splice(9, 3);
-
-							clip = mixer.clipAction(clip);
-							return clip;
-
-						});
-						let idleAnim = THREE.AnimationClip.findByName(schwepeAnims, 'idle');
-
-						idleAnim.tracks.splice(3, 3);
-						idleAnim.tracks.splice(9, 3);
-
-						idle = mixer.clipAction(idleAnim);
-						idle.play();
-						update();
-					}, undefined, function (error) {
-
-						console.error(error);
-
-					});
-				// Add lights
-				let hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
+				// lights
+				const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
 				hemiLight.position.set(0, 50, 0);
 				// Add hemisphere light to scene
 				scene.add(hemiLight);
@@ -326,7 +252,7 @@
 				// Add directional Light to scene
 				scene.add(dirLight);
 
-				// Floor
+				// ground
 				let floorGeometry = new THREE.PlaneGeometry(5000, 5000, 1, 1);
 				let floorMaterial = new THREE.MeshPhongMaterial({
 
@@ -341,24 +267,91 @@
 				floor.position.y = -11;
 				scene.add(floor);
 
-				function update() {
-					
-					requestAnimationFrame(update);
-					if (mixer) {
-						
-						mixer.update(clock.getDelta());
+				//cute green cube
+				const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+				const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+				const cube = new THREE.Mesh(cubeGeo, cubeMat);
 
-					}
+				cube.position.z = 15;
+				cube.position.y = -10;
+
+				scene.add(cube); //this will become clickable
+
+				// the holy juan
+				const loader = new GLTFLoader();
+				loader.load(GLB_PATH, function (gltf) {
+
+					const schwepe = gltf.scene;
+					let schwepeAnims = gltf.animations;
+					schwepe.scale.set(4, 4, 4);
+					schwepe.position.y = -11;
+					scene.add(schwepe);
+
+					schwepe.traverse(o => {
+						if (o.isMesh) {
+							o.castShadow = true;
+							o.receiveShadow = true;
+						}
+						if (o.isBone && o.name === 'mixamorigNeck') {
+							neck = o;
+						}
+						if (o.isBone && o.name === 'mixamorigSpine') {
+							waist = o;
+						}
+					});
+
+					loaderAnim.remove();
+
+					mixer = new THREE.AnimationMixer(schwepe);
+
+					let blinkAnim = THREE.AnimationClip.findByName(schwepeAnims, 'blink');
+					blinkAnim.tracks.splice(3, 3);
+					blinkAnim.tracks.splice(9, 3);
+					blink = mixer.clipAction(blinkAnim).play();
+
+					let idleAnim = THREE.AnimationClip.findByName(schwepeAnims, 'idle');
+					idleAnim.tracks.splice(3, 3);
+					idleAnim.tracks.splice(9, 3);
+					idle = mixer.clipAction(idleAnim).play();
+
+					let jumpAnim = THREE.AnimationClip.findByName(schwepeAnims, 'jump');
+
+					update();
+				}, undefined, function (error) { console.error(error); });
+
+				// renderer
+				renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.setPixelRatio(window.devicePixelRatio);
+				document.body.appendChild(renderer.domElement);
+				
+				// stats
+				stats = new Stats();
+				container.appendChild(stats.dom);
+
+				// const controls = new OrbitControls(camera, renderer.domElement);
+
+				function update() {
+					const dt = clock.getDelta();
+
+					if (mixer) mixer.update(dt);
+
+					requestAnimationFrame(update);
+
 					cube.rotation.x += .004;
 					cube.rotation.y += .004;
 					cube.rotation.z += .004;
+
 					if (resizeRendererToDisplaySize(renderer)) {
-						
+
 						const canvas = renderer.domElement;
 						camera.aspect = canvas.clientWidth / canvas.clientHeight;
 						camera.updateProjectionMatrix();
 
 					}
+
+					stats.update()
 					renderer.render(scene, camera);
 
 				}
@@ -382,14 +375,16 @@
 
 				}
 
+				
+
 				window.addEventListener('click', e => raycast(e));
 				window.addEventListener('touchend', e => raycast(e, true));
 
 				function raycast(e, touch = false) {
-					
+
 					var mouse = {};
 					if (touch) {
-						
+
 						mouse.x = 2 * (e.changedTouches[0].clientX / window.innerWidth) - 1;
 						mouse.y = 1 - 2 * (e.changedTouches[0].clientY / window.innerHeight);
 
@@ -406,13 +401,13 @@
 					var intersects = raycaster.intersectObjects(scene.children, true);
 
 					if (intersects[0]) {
-						
+
 						var object = intersects[0].object;
 
 						if (object.name === 'schwepe') {
 
 							if (!currentlyAnimating) {
-								
+
 								currentlyAnimating = true;
 								playOnClick();
 
@@ -424,9 +419,10 @@
 
 				}
 
-				// Get a random animation, and play it 
+				// make schwepe jump
 				function playOnClick() {
-					mixer.clipAction(gltf.animations[0,1]).play();
+
+					mixer.clipAction(schwepeAnims[0, 1]).play();
 					let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
 					playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
 				}
@@ -515,7 +511,7 @@
 
 			}
 
-		})(); // exitpoint
+		})(); //endpoint
 	</script>
 </body>
 
