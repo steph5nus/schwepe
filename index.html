@@ -182,6 +182,8 @@
 			<cite title="Source Title">ｐｒ❍ｂａｂｌｙ　ｅｎｔｅｒｉｎｇ❓</cite>
 		</a>
 	</figcaption>
+	<script src="js/threex.domevent.js"></script>
+	<script src="js/threex.linkify.js"></script>
 	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 	<script type="importmap">
 	  {
@@ -198,7 +200,6 @@
 		import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/controls/OrbitControls.js';
 		import { CinematicCamera } from 'https://cdn.jsdelivr.net/npm/three@0.142.0/examples/jsm/cameras/CinematicCamera.js';
-
 		(function () {
 
 			// Set our main variables
@@ -211,8 +212,6 @@
 				mixer, idle, blink, jump,
 				raycaster = new THREE.Raycaster(),
 				loaderAnim = document.getElementById('js-loader');
-
-			const api = { state: 'idle' };
 
 			init();
 
@@ -253,7 +252,7 @@
 				scene.add(dirLight);
 
 				// ground
-				let floorGeometry = new THREE.PlaneGeometry(5000, 5000, 1, 1);
+				let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 1, 1);
 				let floorMaterial = new THREE.MeshPhongMaterial({
 
 					color: 0xeeeeee,
@@ -307,12 +306,12 @@
 					let blinkAnim = THREE.AnimationClip.findByName(schwepeAnims, 'blink');
 					blinkAnim.tracks.splice(3, 3);
 					blinkAnim.tracks.splice(9, 3);
-					blink = mixer.clipAction(blinkAnim).play();
+					mixer.clipAction(blinkAnim).play();
 
 					let idleAnim = THREE.AnimationClip.findByName(schwepeAnims, 'idle');
 					idleAnim.tracks.splice(3, 3);
 					idleAnim.tracks.splice(9, 3);
-					idle = mixer.clipAction(idleAnim).play();
+					mixer.clipAction(idleAnim).play();
 
 					let jumpAnim = THREE.AnimationClip.findByName(schwepeAnims, 'jump');
 
@@ -325,7 +324,7 @@
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.setPixelRatio(window.devicePixelRatio);
 				document.body.appendChild(renderer.domElement);
-				
+
 				// stats
 				stats = new Stats();
 				container.appendChild(stats.dom);
@@ -375,8 +374,6 @@
 
 				}
 
-				
-
 				window.addEventListener('click', e => raycast(e));
 				window.addEventListener('touchend', e => raycast(e, true));
 
@@ -398,15 +395,19 @@
 					raycaster.setFromCamera(mouse, camera);
 
 					// calculate objects intersecting the picking ray
-					var intersects = raycaster.intersectObjects(scene.children, true);
-
+					let intersects = raycaster.intersectObjects(scene.children, true);
+					
+					// console.log(intersects);
+					
 					if (intersects[0]) {
-
+						console.log()
+						console.log(intersects[0]);
 						var object = intersects[0].object;
-
-						if (object.name === 'schwepe') {
-
+						
+						if (object.name === 'Schwepe') {
+							console.log('i work');
 							if (!currentlyAnimating) {
+								console.log('i also work');
 
 								currentlyAnimating = true;
 								playOnClick();
@@ -421,10 +422,8 @@
 
 				// make schwepe jump
 				function playOnClick() {
-
-					mixer.clipAction(schwepeAnims[0, 1]).play();
-					let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
-					playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
+					jump = mixer.clipAction(jumpAnim).play();
+					// playModifierAnimation(idle, 0.25, jump, 0.25);
 				}
 
 				function playModifierAnimation(from, fSpeed, to, tSpeed) {
